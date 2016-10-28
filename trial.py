@@ -29,3 +29,5 @@ while True:
 	print("k={0} | {1}".format(k, " ".join("{:.2f}".format(x) for x in new_T)))
 	T = new_T
 	k += 1
+	if k > 250:
+		break
