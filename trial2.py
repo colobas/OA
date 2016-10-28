@@ -96,8 +96,9 @@ constraints.append(sum_entries(F) >= 10*FTarget)
 prob = Problem(objective, constraints)
 result = prob.solve()
 
-print(prob.status)
-print(prob.value)
+
+# Pretty printing daqui para a frente
+
 
 print("T[0]: ", end="\n\t")
 for i in range(5):
