@@ -81,17 +81,28 @@ def randomcolor():
     r = lambda: random.randint(0,255)
     return '#%02X%02X%02X' % (r(),r(),r())
 
+fig1 = plt.figure()
+fig2 = plt.figure()
+fig3 = plt.figure()
 
+Tplot = fig1.add_subplot(111)
+Fplot = fig2.add_subplot(111)
+Pplot = fig3.add_subplot(111)
 
 t = range(K)
-
-
-
 c = [randomcolor() for i in range(10)]
 
 for i in range(10):
     s = T[range(K), i].value
-    plt.plot(t, s, color=c[i])
+    Tplot.plot(t, s, color=c[i])
+
+for i in range(10):
+    s = F[range(K), i].value
+    Fplot.plot(t, s, color=c[i])
+
+for i in range(10):
+    s = P[range(K), i].value
+    Pplot.plot(t, s, color=c[i])
 
 
 plt.show()
