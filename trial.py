@@ -1,33 +1,114 @@
-from SymMatrix import SymMatrix
+from cvxpy import *
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Esquema da topologia
 # 0 1 2 3 4
 # 5 6 7 8 9
 
-A = SymMatrix(10)
+
+# Inicialização de variáveis pelo utilizador
+
+a_ij = float(input("Condutividade térmica entre cores? (A): "))
+K = int(input("Horizonte temporal? (K): "))
+
+a = input("Prima qualquer tecla para continuar")
+
+# Inicialização da matriz que contém os coeficientes de condutividade térmica.
+# Estes são zero para os elementos que não são adjacentes.
+
+A = np.zeros((10,10), dtype=np.float)
 
 for i in range(5):
-	A.set(i, i+5, 1/10)
-	if i < 4:
-		A.set(i, i+1, 1/10)
-		A.set(i+5, i+6, 1/10)
+        A[i][i+5] = A[i+5][i] = a_ij
+        if i < 4:
+                A[i][i+1] = A[i+1][i] = a_ij
+                A[i+5][i+6] = A[i+6][i+5] = a_ij
+
+# ---------------------------------------------------------------------------
+
+# Inicialização do vector de temperaturas iniciais dos cores
+Tini = np.random.uniform(low=70.0, high=100.0, size=10)
+B = np.random.uniform(low=0.01, high=0.1, size=10)
+
+# Constantes do problema
+PMax = 4 # potência em Watts
+FMax = 1 # freq em GHz
+FTarget = 0.8
+
+#----------------------------------------------------------------------------
 
 
-T = [70 for i in range(10)]
+# Variáveis de optimização
+P = Variable(K, 10) # Vectores das potências de cada core
+T = Variable(K, 10) # Vectores das temperaturas de cada core
+F = Variable(K, 10) # Vectores das freqs de cada core
 
-T[3] = T[4] = T[8] = T[9] = 95
+#----------------------------------------------------------------------------
 
-k = 0
+# Definição do problema
+objective = Maximize(sum_entries(sum_entries(F, axis=1)))
 
-def updateTemp(T, i, A):
-	t_i_k = T[i]
-	for j in range(10):
-		t_i_k += A.get(i, j)*(T[j]-T[i])
-	return t_i_k
+constraints = []
 
-while True:
-	new_T = list(map(lambda x: updateTemp(T, x, A), range(10)))
-	print("k={0} | {1}".format(k, " ".join("{:.2f}".format(x) for x in new_T)))
-	T = new_T
-	k += 1
-	if k > 250:
-		break
+constraints.append(T[0,range(10)] == Tini) # T inicial é fixa
+
+for k in range(K):
+        for i in range(10):
+                if k > 0:
+                    N_temp = T[k-1, i] 
+                    for j in range(10):
+                        N_temp += A[i][j]*(T[k-1, j] - T[k-1, i])
+
+                    constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]))
+
+                constraints.append(P[k, i] >= (PMax * (square(F[k, i]) / square(FMax))))
+                constraints.append(P[k, i] <= PMax)
+                constraints.append(F[k, i] >= 0)
+                constraints.append(F[k, i] <= FMax)
+
+constraints.append(sum_entries(F, axis=1) >= 10*FTarget)
+
+#-----------------------------------------------------------------------------
+
+prob = Problem(objective, constraints)
+result = prob.solve()
+
+
+
+import random
+def randomcolor():
+    r = lambda: random.randint(0,255)
+    return '#%02X%02X%02X' % (r(),r(),r())
+
+
+
+t = range(K)
+
+
+
+c = [randomcolor() for i in range(10)]
+
+for i in range(10):
+    s = T[range(K), i].value
+    plt.plot(t, s, color=c[i])
+
+
+plt.show()
+
+
+
+
+
+
+# Pretty printing daqui para a frente
+
+
+#for i in range(K):
+#        print("K:{} ".format(i), end="\n\t")
+#        for j in range(5):
+#            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
+#        print("\n\t", end="")
+#        for j in range(5,10):
+#            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
+#        print("\n")
