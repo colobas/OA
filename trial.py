@@ -1,35 +1,48 @@
 from cvxpy import *
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
 
 # Esquema da topologia
 # 0 1 2 3 4
 # 5 6 7 8 9
 
+try:
+    top = (sys.argv[1])
+    if 'x' not in top:
+        raise Exception
+    K = int(sys.argv[2])
+except:
+    print('Usage: python trial.py <NxM:topology> <int:time_steps>')
+    sys.exit(0)
 
-# Inicialização de variáveis pelo utilizador
 
-a_ij = float(input("Condutividade térmica entre cores? (A): "))
-K = int(input("Horizonte temporal? (K): "))
+N = int(top.split('x')[0])
+M = int(top.split('x')[1])
 
-a = input("Prima qualquer tecla para continuar")
+tot_cores = N*M
+a_ij = 1/tot_cores
 
 # Inicialização da matriz que contém os coeficientes de condutividade térmica.
 # Estes são zero para os elementos que não são adjacentes.
 
-A = np.zeros((10,10), dtype=np.float)
+A = np.zeros((tot_cores, tot_cores), dtype=np.float)
 
-for i in range(5):
-        A[i][i+5] = A[i+5][i] = a_ij
-        if i < 4:
-                A[i][i+1] = A[i+1][i] = a_ij
-                A[i+5][i+6] = A[i+6][i+5] = a_ij
+for i in range(N):
+    for j in range(M):
+        idx = i*M + j
+        if idx < (N-1)*M:
+            A[idx][idx+M] = A[idx+M][idx] = a_ij
+        if j < M-1:
+            A[idx][idx+1] = A[idx+1][idx] = a_ij
+
 
 # ---------------------------------------------------------------------------
 
 # Inicialização do vector de temperaturas iniciais dos cores
-Tini = np.random.uniform(low=70.0, high=100.0, size=10)
-B = np.random.uniform(low=0.07, high=0.1, size=10)
+Tini = np.random.uniform(low=70.0, high=100.0, size=tot_cores)
+B = np.random.uniform(low=0.07, high=0.1, size=tot_cores)
 
 # Constantes do problema
 TMax = 100
@@ -40,24 +53,24 @@ FMax = 1 # freq em GHz
 
 
 # Variáveis de optimização
-P = Variable(K, 10) # Vectores das potências de cada core
-T = Variable(K, 10) # Vectores das temperaturas de cada core
-F = Variable(K, 10) # Vectores das freqs de cada core
+P = Variable(K, tot_cores) # Vectores das potências de cada core
+T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
+F = Variable(K, tot_cores) # Vectores das freqs de cada core
 FTarget = Variable(1)
 #----------------------------------------------------------------------------
 
 # Definição do problema
-objective = Maximize(FTarget)
+objective = Maximize(sum(sum_entries(F, axis=1)))
 
 constraints = []
 
-constraints.append(T[0,range(10)] == Tini) # T inicial é fixa
+constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
 
 for k in range(K):
     if k > 0:
-        for i in range(10):
+        for i in range(tot_cores):
             N_temp = T[k-1, i] 
-            for j in range(10):
+            for j in range(tot_cores):
                 N_temp += A[i][j]*(T[k-1, j] - T[k-1, i])
 
             constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]))
@@ -67,7 +80,7 @@ for k in range(K):
     constraints.append(F[k,:] >= 0)
     constraints.append(F[k,:] <= FMax)
     constraints.append(T[k,:] <= TMax)
-    constraints.append(sum_entries(F[k, :]) >= 10*FTarget)
+    constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
 
 
 #-----------------------------------------------------------------------------
@@ -86,24 +99,24 @@ def randomcolor():
 
 plt.figure(1)
 
-c = [randomcolor() for i in range(10)]
+c = [randomcolor() for i in range(tot_cores)]
 
 
 plt.subplot(311)
 plt.title('T(k)')
-for i in range(10):
+for i in range(tot_cores):
     s = T[range(K), i].value
     plt.plot(s, color=c[i])
 
 plt.subplot(312)
 plt.title('F(k)')
-for i in range(10):
+for i in range(tot_cores):
     s = F[range(K), i].value
     plt.plot(s, color=c[i])
 
 plt.subplot(313)
 plt.title('P(k)')
-for i in range(10):
+for i in range(tot_cores):
     s = P[range(K), i].value
     plt.plot(s, color=c[i])
 
@@ -123,6 +136,6 @@ plt.show()
 #        for j in range(5):
 #            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
 #        print("\n\t", end="")
-#        for j in range(5,10):
+#        for j in range(5,tot_cores):
 #            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
 #        print("\n")
