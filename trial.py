@@ -63,7 +63,7 @@ F = Variable(K, tot_cores) # Vectores das freqs de cada core
 # Definição do problema
 objective = Maximize(sum(sum_entries(F, axis=1)))
 
-constraints = [] #dummy
+constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
 constraints.append(F[0,range(tot_cores)] == Fini) # F inicial é fixa
