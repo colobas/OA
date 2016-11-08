@@ -39,15 +39,17 @@ for i in range(N):
 
 
 # ---------------------------------------------------------------------------
-
-# Inicialização do vector de temperaturas iniciais dos cores
-Tini = np.random.uniform(low=70.0, high=100.0, size=tot_cores)
-B = np.random.uniform(low=0.07, high=0.1, size=tot_cores)
-
 # Constantes do problema
 TMax = 100
 PMax = 4 # potência em Watts
 FMax = 1 # freq em GHz
+
+
+# Inicialização do vector de temperaturas iniciais dos cores
+Tini = np.random.uniform(low=70.0, high=100.0, size=tot_cores)
+Fini = np.random.uniform(low=0.5, high=1, size=tot_cores)*FMax
+B = np.random.uniform(low=0.01, high=1, size=tot_cores)*5
+print(B)
 
 #----------------------------------------------------------------------------
 
@@ -56,8 +58,7 @@ FMax = 1 # freq em GHz
 P = Variable(K, tot_cores) # Vectores das potências de cada core
 T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
 F = Variable(K, tot_cores) # Vectores das freqs de cada core
-FTarget = Variable(1)
-#----------------------------------------------------------------------------
+#---------------------------------------------------------------
 
 # Definição do problema
 objective = Maximize(sum(sum_entries(F, axis=1)))
@@ -65,6 +66,7 @@ objective = Maximize(sum(sum_entries(F, axis=1)))
 constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
+constraints.append(F[0,range(tot_cores)] == Fini) # F inicial é fixa
 
 for k in range(K):
     if k > 0:
@@ -74,13 +76,14 @@ for k in range(K):
                 N_temp += A[i][j]*(T[k-1, j] - T[k-1, i])
 
             constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]))
-
+    FTarget = Variable(1)
+    # -------------
     constraints.append(P[k,:] >= (PMax * (square(F[k,:] / FMax))))
     constraints.append(P[k,:] <= PMax)
     constraints.append(F[k,:] >= 0)
     constraints.append(F[k,:] <= FMax)
     constraints.append(T[k,:] <= TMax)
-    constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
+    #constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
 
 
 #-----------------------------------------------------------------------------
