@@ -57,7 +57,6 @@ p = 0.1
 P = Variable(K, tot_cores) # Vectores das potências de cada core
 T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
 F = Variable(K, tot_cores) # Vectores das freqs de cada core
-FTarget = Variable(1)
 #----------------------------------------------------------------------------
 
 SumF = Variable(1)
@@ -88,7 +87,6 @@ for k in range(K):
     constraints.append(F[k,:] >= 0)
     constraints.append(F[k,:] <= FMax)
     constraints.append(T[k,:] <= TMax)
-    constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
 
 
 #-----------------------------------------------------------------------------

@@ -58,7 +58,6 @@ results = np.zeros(len(Ro))
 P = Variable(K, tot_cores) # Vectores das potências de cada core
 T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
 F = Variable(K, tot_cores) # Vectores das freqs de cada core
-FTarget = Variable(1)
 #----------------------------------------------------------------------------
 
 SumF = Variable(1)
@@ -83,7 +82,6 @@ for k in range(K):
     constraints.append(F[k,:] >= 0)
     constraints.append(F[k,:] <= FMax)
     constraints.append(T[k,:] <= TMax)
-    constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
 #-----------------------------------------------------------------------------
 
 
@@ -92,10 +90,19 @@ for i in range(len(Ro)):
     prob = Problem(objective, constraints)
     result = prob.solve()
     results[i] = SumF.value
+    print("{}% done".format(100*i/len(Ro)))
 
 
+print("Ro:")
+print(Ro)
 
-plt.figure(1)
-plt.title('T(k)')
-plt.plot(Ro, results)
+print("SumFs")
+print(results)
+
+
+fig = plt.figure(1)
+ax = fig.add_subplot(2,1,1)
+ax.plot(Ro, results)
+ax.set_xscale('log')
+plt.title('Trade-off: Sum(F) / "Ró"')
 plt.show()
