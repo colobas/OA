@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 import sys
 
 
-# Esquema da topologia
-# 0 1 2 3 4
-# 5 6 7 8 9
-
 try:
     top = (sys.argv[1])
     if 'x' not in top:
@@ -41,7 +37,7 @@ for i in range(N):
 # ---------------------------------------------------------------------------
 
 # Inicialização do vector de temperaturas iniciais dos cores
-Tini = np.random.uniform(low=70.0, high=100.0, size=tot_cores)
+Tini = np.random.uniform(low=40.0, high=60.0, size=tot_cores)
 B = np.random.uniform(low=0.07, high=0.1, size=tot_cores)
 
 # Constantes do problema
@@ -60,7 +56,7 @@ FTarget = Variable(1)
 #----------------------------------------------------------------------------
 
 # Definição do problema
-objective = Maximize(sum(sum_entries(F, axis=1)))
+objective = Maximize(sum_entries(F))
 
 constraints = []
 
