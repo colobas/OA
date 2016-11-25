@@ -130,20 +130,3 @@ for i in range(tot_cores):
 
 
 plt.show()
-
-
-
-
-
-
-# Pretty printing daqui para a frente
-
-
-#for i in range(K):
-#        print("K:{} ".format(i), end="\n\t")
-#        for j in range(5):
-#            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
-#        print("\n\t", end="")
-#        for j in range(5,tot_cores):
-#            print("T:{:.3f} F:{:.3f} P:{:.3f}".format(T[i, j].value, F[i, j].value, P[i, j].value), end=" | ")
-#        print("\n")
