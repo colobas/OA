@@ -49,7 +49,7 @@ for i in range(round(K/3), round(2*K/3)):
 TMax = 100
 PMax = 4 # potência em Watts
 FMax = 1 # freq em GHz
-
+p = 0.1
 #----------------------------------------------------------------------------
 
 
@@ -60,12 +60,19 @@ F = Variable(K, tot_cores) # Vectores das freqs de cada core
 FTarget = Variable(1)
 #----------------------------------------------------------------------------
 
+SumF = Variable(1)
+
+
+
 # Definição do problema
-objective = Maximize(sum_entries(F))
+objective = Minimize(-SumF + tv(F.T)*p)
 
 constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
+constraints.append(SumF == sum_entries(F))
+
+
 
 for k in range(K):
     if k > 0:
