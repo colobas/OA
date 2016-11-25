@@ -38,7 +38,12 @@ for i in range(N):
 
 # Inicialização do vector de temperaturas iniciais dos cores
 Tini = np.random.uniform(low=40.0, high=60.0, size=tot_cores)
+Tmb = np.zeros(K)
 B = np.random.uniform(low=0.07, high=0.1, size=tot_cores)
+
+for i in range(round(K/3), round(2*K/3)):
+    Tmb[i] = 10
+
 
 # Constantes do problema
 TMax = 100
@@ -69,7 +74,7 @@ for k in range(K):
             for j in range(tot_cores):
                 N_temp += A[i][j]*(T[k-1, j] - T[k-1, i])
 
-            constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]))
+            constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]) + a_ij*Tmb[k-1]/10)
 
     constraints.append(P[k,:] >= (PMax * (square(F[k,:] / FMax))))
     constraints.append(P[k,:] <= PMax)
