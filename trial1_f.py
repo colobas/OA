@@ -97,5 +97,5 @@ for i in range(len(Ro)):
 
 plt.figure(1)
 plt.title('T(k)')
-plt.plot(P, results)
+plt.plot(Ro, results)
 plt.show()
