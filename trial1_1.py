@@ -2,22 +2,14 @@ from cvxpy import *
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import settings1 as st
 
 
-try:
-    top = (sys.argv[1])
-    if 'x' not in top:
-        raise Exception
-    K = int(sys.argv[2])
-except:
-    print('Usage: python trial.py <NxM:topology> <int:time_steps>')
-    sys.exit(0)
+K=250
+tot_cores=10
+N=5
+M=2
 
-
-N = int(top.split('x')[0])
-M = int(top.split('x')[1])
-
-tot_cores = N*M
 a_ij = 1/tot_cores
 
 # Inicialização da matriz que contém os coeficientes de condutividade térmica.
@@ -42,10 +34,8 @@ FMax = 1 # freq em GHz
 
 
 # Inicialização do vector de temperaturas iniciais dos cores
-Tini = np.random.uniform(low=70.0, high=100.0, size=tot_cores)
-Fini = np.random.uniform(low=0.5, high=1, size=tot_cores)*FMax
-B = np.random.uniform(low=0.01, high=1, size=tot_cores)*5
-print(B)
+Tini = st.Tini
+B = st.B
 
 #----------------------------------------------------------------------------
 
@@ -59,10 +49,9 @@ F = Variable(K, tot_cores) # Vectores das freqs de cada core
 # Definição do problema
 objective = Maximize(sum_entries(F))
 
-constraints = [] #dummy
+constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
-constraints.append(F[0,range(tot_cores)] == Fini) # F inicial é fixa
 
 for k in range(K):
     if k > 0:
@@ -72,14 +61,12 @@ for k in range(K):
                 N_temp += A[i][j]*(T[k-1, j] - T[k-1, i])
 
             constraints.append(T[k, i] == (N_temp + B[i]*P[k, i]))
-    FTarget = Variable(1)
     # -------------
     constraints.append(P[k,:] >= (PMax * (square(F[k,:] / FMax))))
     constraints.append(P[k,:] <= PMax)
     constraints.append(F[k,:] >= 0)
     constraints.append(F[k,:] <= FMax)
     constraints.append(T[k,:] <= TMax)
-    #constraints.append(sum_entries(F[k, :]) >= tot_cores*FTarget)
 
 
 #-----------------------------------------------------------------------------

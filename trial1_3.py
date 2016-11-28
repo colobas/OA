@@ -2,22 +2,14 @@ from cvxpy import *
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import settings1 as st
 
 
-try:
-    top = (sys.argv[1])
-    if 'x' not in top:
-        raise Exception
-    K = int(sys.argv[2])
-except:
-    print('Usage: python trial.py <NxM:topology> <int:time_steps>')
-    sys.exit(0)
+K=250
+tot_cores=10
+N=5
+M=2
 
-
-N = int(top.split('x')[0])
-M = int(top.split('x')[1])
-
-tot_cores = N*M
 a_ij = 1/tot_cores
 
 # Inicialização da matriz que contém os coeficientes de condutividade térmica.
@@ -35,12 +27,20 @@ for i in range(N):
 
 
 # ---------------------------------------------------------------------------
+# Constantes do problema
+TMax = 100
+PMax = 4 # potência em Watts
+FMax = 1 # freq em GHz
+
 
 # Inicialização do vector de temperaturas iniciais dos cores
-Tini = np.random.uniform(low=40.0, high=60.0, size=tot_cores)
-Tmb = np.zeros(K)
-B = np.random.uniform(low=0.07, high=0.1, size=tot_cores)
+Tini = st.Tini
+B = st.B
 
+
+
+
+Tmb = np.zeros(K)
 for i in range(round(K/3), round(2*K/3)):
     Tmb[i] = 10
 
