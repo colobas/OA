@@ -46,6 +46,9 @@ T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
 F = Variable(K, tot_cores) # Vectores das freqs de cada core
 #---------------------------------------------------------------
 
+
+print("A correr trial sem influência de uma fonte externa de calor")
+
 # Definição do problema
 objective = Maximize(sum_entries(F))
 

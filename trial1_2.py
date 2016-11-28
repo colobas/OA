@@ -37,20 +37,12 @@ FMax = 1 # freq em GHz
 Tini = st.Tini
 B = st.B
 
-
+print("Correndo trial no qual há influência de uma fonte de calor externa")
 
 
 Tmb = np.zeros(K)
 for i in range(round(K/3), round(2*K/3)):
     Tmb[i] = 10
-
-
-# Constantes do problema
-TMax = 100
-PMax = 4 # potência em Watts
-FMax = 1 # freq em GHz
-
-#----------------------------------------------------------------------------
 
 
 # Variáveis de optimização

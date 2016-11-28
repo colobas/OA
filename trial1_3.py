@@ -36,6 +36,9 @@ FMax = 1 # freq em GHz
 # Inicialização do vector de temperaturas iniciais dos cores
 Tini = st.Tini
 B = st.B
+p = 0.1
+print("Correndo trial para o qual há influência de uma fonte de calor externa e se tenta minimizar"
+      " a diferenca de temperatura entre cada dois instantes de tempo")
 
 
 
@@ -45,23 +48,13 @@ for i in range(round(K/3), round(2*K/3)):
     Tmb[i] = 10
 
 
-# Constantes do problema
-TMax = 100
-PMax = 4 # potência em Watts
-FMax = 1 # freq em GHz
-p = 0.1
-#----------------------------------------------------------------------------
-
-
 # Variáveis de optimização
 P = Variable(K, tot_cores) # Vectores das potências de cada core
 T = Variable(K, tot_cores) # Vectores das temperaturas de cada core
 F = Variable(K, tot_cores) # Vectores das freqs de cada core
-#----------------------------------------------------------------------------
-
 SumF = Variable(1)
-
-
+OscTerm = Variable(1)
+#----------------------------------------------------------------------------
 
 # Definição do problema
 objective = Minimize(-SumF + tv(F.T)*p)
@@ -70,8 +63,7 @@ constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
 constraints.append(SumF == sum_entries(F))
-
-
+#constraints.append(OscTerm == tv(F.T))
 
 for k in range(K):
     if k > 0:

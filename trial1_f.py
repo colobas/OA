@@ -53,14 +53,12 @@ F = Variable(K, tot_cores) # Vectores das freqs de cada core
 #----------------------------------------------------------------------------
 
 SumF = Variable(1)
-OscTerm = Variable(1)
 
 
 constraints = []
 
 constraints.append(T[0,range(tot_cores)] == Tini) # T inicial é fixa
 constraints.append(SumF == sum_entries(F))
-constraints.append(OscTerm == tv(F.T))
 
 
 for k in range(K):
@@ -80,11 +78,11 @@ for k in range(K):
 
 
 for i in range(len(Ro)):
-    objective = Minimize(-SumF + OscTerm*Ro[i])
+    objective = Minimize(-SumF + tv(F.T)*Ro[i])
     prob = Problem(objective, constraints)
     result = prob.solve()
     sumFreqs[i] = SumF.value
-    oscTerms[i] = OscTerm.value
+    oscTerms[i] = (result + SumF.value)/Ro[i]
     print("{}% done".format(100*i/len(Ro)))
 
 
