@@ -78,7 +78,7 @@ for k in range(K):
 
 
 for i in range(len(Ro)):
-    objective = Minimize(-SumF + tv(F.T)*Ro[i])
+    objective = Minimize(-SumF + sum([tv(F[:,i]) for i in range(tot_cores)])*Ro[i])
     prob = Problem(objective, constraints)
     result = prob.solve()
     sumFreqs[i] = SumF.value

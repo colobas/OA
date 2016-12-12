@@ -57,7 +57,7 @@ OscTerm = Variable(1)
 #----------------------------------------------------------------------------
 
 # Definição do problema
-objective = Minimize(-SumF + tv(F.T)*p)
+objective = Minimize(-SumF + sum([tv(F[:,i]) for i in range(tot_cores)])*p)
 
 constraints = []
 
