@@ -1,4 +1,3 @@
-# OA
-Projecto OA 2016/2017
+# Optimization and Algorithms project - Winter Semester 2016/2017 @ Técnico Lisboa, Portugal
 
-adoro este projecto
+Playing with Convex Optimization and CVXPY
